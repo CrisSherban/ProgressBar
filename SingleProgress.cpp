@@ -1,4 +1,3 @@
-#include <iostream>
 #include "SingleProgress.h"
 
 SingleProgress::SingleProgress() {
