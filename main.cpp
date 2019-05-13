@@ -4,8 +4,8 @@
 #include <iostream>
 #include "SFML/Graphics.hpp"
 
-#include "SingleProgress.h"
-#include "OverallProgress.h"
+#include "FileTransfer.h"
+#include "ProgressBar.h"
 
 int main() {
 
@@ -26,8 +26,10 @@ int main() {
     text.setCharacterSize(20);
     text.setFillColor(sf::Color::Green);
 
-    SingleProgress singleProgress;
-    OverallProgress overallProgress(&singleProgress, &window);
+    FileTransfer fileTransfer("/home/Project", &window);
+    ProgressBar overall(&fileTransfer, &window, "overall");
+    ProgressBar single(&fileTransfer, &window, "single");
+
 
     while (window.isOpen()) {
 
@@ -41,7 +43,6 @@ int main() {
             window.draw(text);
             window.display();
 
-            // Close window: exit
             if (event.type == sf::Event::Closed)
                 window.close();
 
@@ -49,7 +50,7 @@ int main() {
                 if (event.key.code == sf::Keyboard::Enter) {
                     window.setTitle("Progress Bar");
 
-                    transferred = singleProgress.transfer();
+                    transferred = fileTransfer.TransferFile("/home/Important");
                     if (!transferred) {
                         window.setTitle("");
                         text.setString("Transfer canceled!");
