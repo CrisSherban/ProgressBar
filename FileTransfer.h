@@ -2,6 +2,7 @@
 #define BAR_SINGLEPROGRESS_H
 
 #include <list>
+
 #include "Subject.h"
 #include "SFML/Graphics.hpp"
 
@@ -14,7 +15,7 @@
 class FileTransfer : public Subject {
 
 public:
-    explicit FileTransfer(std::string directoryLocation, sf::RenderWindow *w);
+    explicit FileTransfer(std::string directoryLocation);
 
     virtual void addObserver(Observer *o) override;
 
@@ -22,20 +23,26 @@ public:
 
     virtual void notify() override;
 
-    bool TransferFile(std::string location);
+    void Transfer(std::string location);
+
+    void Transferred() const;
 
     virtual ~FileTransfer() {}
+
+
+    const unsigned long getFileNamesSize() const;
+
+    int getFilesTransferred() const;
+
 
 private:
     std::list<Observer *> obs;
     std::list<std::string> fileNames;
     std::string directoryName;
-    sf::RenderWindow *window;
-    sf::Event event;
+    std::string location;
     int filesTransferred;
     int bytesTransferred;
     int fileSize;
-    bool canceled;
 };
 
 

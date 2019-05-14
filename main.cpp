@@ -2,8 +2,8 @@
 //using Design Pattern Observer PUSH
 
 #include <iostream>
-#include "SFML/Graphics.hpp"
 
+#include "SFML/Graphics.hpp"
 #include "FileTransfer.h"
 #include "ProgressBar.h"
 
@@ -12,7 +12,6 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(300, 30), "", sf::Style::Close);
     sf::Font DroidSans;
     sf::Text text;
-    bool transferred;
 
     //centers the screen
     auto desktop = sf::VideoMode::getDesktopMode();
@@ -20,16 +19,16 @@ int main() {
                                     desktop.height / 2 - window.getSize().y / 2));
 
     if (!DroidSans.loadFromFile("DroidSans.ttf"))
-        std::cout << ("Font can't load") << std::endl;
+        std::cerr << ("Font can't load") << std::endl;
 
     text.setFont(DroidSans);
     text.setCharacterSize(20);
     text.setFillColor(sf::Color::Green);
 
-    FileTransfer fileTransfer("/home/Project", &window);
+    FileTransfer fileTransfer("/home/Project");
+
     ProgressBar overall(&fileTransfer, &window, "overall");
     ProgressBar single(&fileTransfer, &window, "single");
-
 
     while (window.isOpen()) {
 
@@ -50,26 +49,38 @@ int main() {
                 if (event.key.code == sf::Keyboard::Enter) {
                     window.setTitle("Progress Bar");
 
-                    transferred = fileTransfer.TransferFile("/home/Important");
-                    if (!transferred) {
+                    //the while scans the files in the directory and calls
+                    //fileTransfer of there are files left to transfer
+                    while (fileTransfer.getFilesTransferred() < fileTransfer.getFileNamesSize()) {
+                        sf::Event abort;
+                        while (window.pollEvent(abort)) {
+                            if (abort.type == sf::Event::Closed) {
+                                window.setTitle("");
+                                text.setString("Transfer canceled!");
+                                window.clear();
+                                window.draw(text);
+                                window.display();
+                                fileTransfer.Transferred();
+                                sf::sleep(sf::seconds(2));
+                                window.close();
+                                return 1;
+                            }
+                        }
+                        fileTransfer.Transfer("/home/Important");
+                    }
+
+
+                    if (window.isOpen()) {
                         window.setTitle("");
-                        text.setString("Transfer canceled!");
+                        text.setString("Transfer completed!");
+                        fileTransfer.Transferred();
+
                         window.clear();
                         window.draw(text);
                         window.display();
                         sf::sleep(sf::seconds(2));
-                        window.close();
-                        return 1;
+                        return 0;
                     }
-
-                    window.setTitle("");
-                    text.setString("Transfer completed!");
-
-                    window.clear();
-                    window.draw(text);
-                    window.display();
-                    sf::sleep(sf::seconds(2));
-                    return 0;
                 }
         }
     }

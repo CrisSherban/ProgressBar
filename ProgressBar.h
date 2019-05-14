@@ -1,7 +1,6 @@
 #ifndef BAR_OVERALLPROGRESS_H
 #define BAR_OVERALLPROGRESS_H
 
-#include <iostream>
 #include "Observer.h"
 #include "FileTransfer.h"
 
@@ -24,5 +23,6 @@ private:
     FileTransfer *subject;
     std::string type;
 };
+
 
 #endif //BAR_OVERALLPROGRESS_H
