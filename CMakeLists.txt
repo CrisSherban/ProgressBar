@@ -3,7 +3,8 @@ project(Bar)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(Bar main.cpp Observer.h Subject.h ProgressBar.cpp ProgressBar.h FileTransfer.cpp FileTransfer.h)
+add_executable(Bar main.cpp Observer.h Subject.h ProgressBar.cpp ProgressBar.h FileTransfer.cpp FileTransfer.h
+        DialogBox.cpp DialogBox.h Text.cpp Text.h)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")
 find_package(SFML REQUIRED system window graphics network audio)

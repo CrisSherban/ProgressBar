@@ -10,9 +10,10 @@ class ProgressBar : public Observer {
 public:
 
     //type can be overall or single
-    ProgressBar(FileTransfer *s, sf::RenderWindow *w, std::string type);
+    ProgressBar(FileTransfer *s, sf::RenderWindow *w, std::string type,
+                unsigned int x, unsigned int y, sf::Color color);
 
-    virtual void update(int filesTransferred, int bytesTransferred) override;
+    virtual void update() override;
 
     virtual ~ProgressBar();
 

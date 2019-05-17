@@ -1,9 +1,11 @@
 #include <iostream>
+
 #include "FileTransfer.h"
 
 FileTransfer::FileTransfer(std::string directoryLocation) : directoryName(std::move(directoryLocation)),
-                                                            bytesTransferred(0), filesTransferred(0) {
+                                                            bytesTransferred(0), numFilesTransferred(0) {
 
+    filesTransferred = "";
     //default size of each file
     fileSize = 300;
 
@@ -11,6 +13,9 @@ FileTransfer::FileTransfer(std::string directoryLocation) : directoryName(std::m
     //by default the directory has 30 files
     for (int i = 0; i < 30; i++)
         fileNames.emplace_back(std::to_string(rand() % 1000) + ".bin");
+    it = fileNames.begin();
+
+
 }
 
 void FileTransfer::addObserver(Observer *o) {
@@ -23,47 +28,60 @@ void FileTransfer::removeObserver(Observer *o) {
 
 void FileTransfer::notify() {
     for (auto o : obs)
-        o->update(filesTransferred, bytesTransferred);
+        o->update();
 };
 
-void FileTransfer::Transfer(std::string location) {
+bool FileTransfer::Transfer(std::string location, sf::RenderWindow &window) {
 
     //simulates the file transfer
     //10 bytes at a time
-    bytesTransferred = 0;
-    this->location = std::move(location);
-    for (int i = 0; i < fileSize / 10; i++) {
-        //this 'if' explains why progress bars get stuck at the end   \ (•◡•) /
-        if (i > 27)
-            sf::sleep(sf::seconds(0.07));
-        else
-            sf::sleep(sf::seconds(static_cast<float >(rand() % 10) / 250));
-        bytesTransferred += 10;
-        notify();
-    }
-    filesTransferred++;
-    notify();
-}
+    for (int j = 0; j < fileNames.size(); j++, ++it) {
+        bytesTransferred = 0;
+        for (int i = 0; i < fileSize / 10; i++) {
+            //this 'if' explains why progress bars get stuck at the end   \ (•◡•) /
+            if (i > 27)
+                sf::sleep(sf::seconds(0.07));
+            else
+                sf::sleep(sf::seconds(static_cast<float>(rand() % 10) / 250));
+            bytesTransferred += 10;
+            notify();
+        }
 
+
+        if (j % 10 == 0)
+            filesTransferred.append("\n");
+        filesTransferred.append((*it) + " ");
+
+        numFilesTransferred++;
+        notify();
+
+        //handles the possibility of closing the window during the transfer
+        sf::Event abort;
+        while (window.pollEvent(abort)) {
+            if (abort.type == sf::Event::Closed) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 const unsigned long FileTransfer::getFileNamesSize() const {
     return fileNames.size();
 }
 
-int FileTransfer::getFilesTransferred() const {
+const int FileTransfer::getNumFilesTransferred() const {
+    return numFilesTransferred;
+}
+
+const std::string &FileTransfer::getFilesTransferred() const {
     return filesTransferred;
 }
 
-void FileTransfer::Transferred() const {
-    std::cout << "Files transferred: " << std::endl;
-    int index = 0;
-    auto it = fileNames.begin();
+const int FileTransfer::getBytesTransferred() const {
+    return bytesTransferred;
+}
 
-    while (index < filesTransferred) {
-        std::cout << *it << " ";
-        index++;
-        it++;
-        if (index % 10 == 0)
-            std::cout << std::endl;
-    }
+const std::string &FileTransfer::getFileTransferring() const {
+    return *it;
 }

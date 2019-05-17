@@ -3,18 +3,16 @@
 
 #include <list>
 
-#include "Subject.h"
 #include "SFML/Graphics.hpp"
+#include "Subject.h"
 
-
-//this is used as concrete subject
-
-//usually a directory contains multiple files
-//FileTransfer represents the transfer progress of a file of the directory
+//this is used as concrete subject to transfer the files
+//from a directory to another one
 
 class FileTransfer : public Subject {
 
 public:
+
     explicit FileTransfer(std::string directoryLocation);
 
     virtual void addObserver(Observer *o) override;
@@ -23,25 +21,34 @@ public:
 
     virtual void notify() override;
 
-    void Transfer(std::string location);
-
-    void Transferred() const;
+    bool Transfer(std::string location, sf::RenderWindow &window);
 
     virtual ~FileTransfer() {}
 
 
+    //getters
+    const std::string &getFilesTransferred() const;
+
     const unsigned long getFileNamesSize() const;
 
-    int getFilesTransferred() const;
+    const int getNumFilesTransferred() const;
+
+    const int getBytesTransferred() const;
+
+    const std::string &getFileTransferring() const;
 
 
 private:
     std::list<Observer *> obs;
     std::list<std::string> fileNames;
+    std::list<std::string>::iterator it;
     std::string directoryName;
     std::string location;
-    int filesTransferred;
+    std::string filesTransferred;
+    int numFilesTransferred;
     int bytesTransferred;
+
+private:
     int fileSize;
 };
 

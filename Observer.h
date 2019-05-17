@@ -5,7 +5,7 @@
 
 class Observer {
 public:
-    virtual void update(int filesTransferred, int bytesTransferred) = 0;
+    virtual void update() = 0;
 
     virtual ~Observer() {}
 };

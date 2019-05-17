@@ -1,88 +1,24 @@
 //Progress bar that simulates a file transfer
-//using Design Pattern Observer PUSH
+//using Design Pattern Observer PULL
 
 #include <iostream>
 
 #include "SFML/Graphics.hpp"
 #include "FileTransfer.h"
+#include "DialogBox.h"
 #include "ProgressBar.h"
+#include "Text.h"
+
 
 int main() {
 
-    sf::RenderWindow window(sf::VideoMode(300, 30), "", sf::Style::Close);
-    sf::Font DroidSans;
-    sf::Text text;
-
-    //centers the screen
-    auto desktop = sf::VideoMode::getDesktopMode();
-    window.setPosition(sf::Vector2i(desktop.width / 2 - window.getSize().x / 2,
-                                    desktop.height / 2 - window.getSize().y / 2));
-
-    if (!DroidSans.loadFromFile("DroidSans.ttf"))
-        std::cerr << ("Font can't load") << std::endl;
-
-    text.setFont(DroidSans);
-    text.setCharacterSize(20);
-    text.setFillColor(sf::Color::Green);
-
     FileTransfer fileTransfer("/home/Project");
 
-    ProgressBar overall(&fileTransfer, &window, "overall");
-    ProgressBar single(&fileTransfer, &window, "single");
+    DialogBox dialogBox(&fileTransfer);
 
-    while (window.isOpen()) {
+    ProgressBar overall(&fileTransfer, &dialogBox.getWindow(), "overall", 0, 0, sf::Color::Green);
+    Text currentFile(&fileTransfer, &dialogBox.getWindow(), dialogBox.getFont(), sf::Color::White);
+    ProgressBar single(&fileTransfer, &dialogBox.getWindow(), "single", 0, 20, sf::Color::Green);
 
-        sf::Event event;
-        while (window.pollEvent(event)) {
-
-            window.setTitle("Transfer");
-            text.setString("Press Enter to transfer directory");
-
-            window.clear();
-            window.draw(text);
-            window.display();
-
-            if (event.type == sf::Event::Closed)
-                window.close();
-
-            if (event.type == sf::Event::KeyPressed)
-                if (event.key.code == sf::Keyboard::Enter) {
-                    window.setTitle("Progress Bar");
-
-                    //the while scans the files in the directory and calls
-                    //fileTransfer of there are files left to transfer
-                    while (fileTransfer.getFilesTransferred() < fileTransfer.getFileNamesSize()) {
-                        sf::Event abort;
-                        while (window.pollEvent(abort)) {
-                            if (abort.type == sf::Event::Closed) {
-                                window.setTitle("");
-                                text.setString("Transfer canceled!");
-                                window.clear();
-                                window.draw(text);
-                                window.display();
-                                fileTransfer.Transferred();
-                                sf::sleep(sf::seconds(2));
-                                window.close();
-                                return 1;
-                            }
-                        }
-                        fileTransfer.Transfer("/home/Important");
-                    }
-
-
-                    if (window.isOpen()) {
-                        window.setTitle("");
-                        text.setString("Transfer completed!");
-                        fileTransfer.Transferred();
-
-                        window.clear();
-                        window.draw(text);
-                        window.display();
-                        sf::sleep(sf::seconds(2));
-                        return 0;
-                    }
-                }
-        }
-    }
-    return 0;
+    return dialogBox.init();
 }
