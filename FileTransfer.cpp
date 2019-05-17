@@ -3,9 +3,9 @@
 #include "FileTransfer.h"
 
 FileTransfer::FileTransfer(std::string directoryLocation) : directoryName(std::move(directoryLocation)),
-                                                            bytesTransferred(0), numFilesTransferred(0) {
+                                                            bytesTransferred(0), numFilesTransferred(0),
+                                                            filesTransferred("") {
 
-    filesTransferred = "";
     //default size of each file
     fileSize = 300;
 
@@ -31,7 +31,7 @@ void FileTransfer::notify() {
         o->update();
 };
 
-bool FileTransfer::Transfer(std::string location, sf::RenderWindow &window) {
+bool FileTransfer::Transfer(const std::string &location, sf::RenderWindow &window) {
 
     //simulates the file transfer
     //10 bytes at a time

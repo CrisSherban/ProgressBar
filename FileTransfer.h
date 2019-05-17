@@ -21,7 +21,7 @@ public:
 
     virtual void notify() override;
 
-    bool Transfer(std::string location, sf::RenderWindow &window);
+    bool Transfer(const std::string &location, sf::RenderWindow &window);
 
     virtual ~FileTransfer() {}
 
