@@ -6,17 +6,17 @@ Text::Text(FileTransfer *subject, sf::RenderWindow *window, sf::Font &font,
     subject->addObserver(this);
     text.setPosition(x, y);
     text.setFillColor(color);
-    text.setCharacterSize(9);
+    text.setCharacterSize(14);
     text.setFont(font);
     rectangleShape.setPosition(sf::Vector2f(0, 10));
-    rectangleShape.setSize(sf::Vector2f(300, 10));
+    rectangleShape.setSize(sf::Vector2f(300, 20));
     rectangleShape.setFillColor(sf::Color::Black);
 
 }
 
 void Text::update() {
 
-    text.setString(subject->getFileTransferring());
+    text.setString(subject->getFileTransferring()->first);
     window->draw(rectangleShape);
     window->draw(text);
 }

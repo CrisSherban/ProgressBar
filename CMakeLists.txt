@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 project(Bar)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(test)
 
@@ -21,4 +21,5 @@ if (SFML_FOUND)
     #linking sfml to core so we can access the sfml library in gtests
 endif ()
 
-target_link_libraries(Bar core)
+#linked stdc++fs static library for file reading
+target_link_libraries(Bar core stdc++fs)

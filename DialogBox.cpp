@@ -44,7 +44,7 @@ int DialogBox::run() {
     window.clear();
     window.setTitle("Progress Bar");
 
-    if (fileTransfer->Transfer("/home/Important", window)) {
+    if (fileTransfer->Transfer(window, fileTransfer->getSourceLocation(), fileTransfer->getDestLocation())) {
 
         window.setTitle("");
         text.setString("Transfer completed!");

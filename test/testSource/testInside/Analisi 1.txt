@@ -1,0 +1,1 @@
+ L'analisi matematica è il ramo della matematica che si occupa delle proprietà che emergono dalla scomposizione infinita di un oggetto denso. Si fonda sul calcolo infinitesimale, con il quale, attraverso le nozioni di limite e continuità, studia il comportamento locale di una funzione utilizzando gli strumenti del calcolo differenziale e del calcolo integrale. 

@@ -18,7 +18,7 @@
 #
 # By default, the dynamic libraries of SFML will be found. To find the static ones instead,
 # you must set the SFML_STATIC_LIBRARIES variable to TRUE before calling find_package(SFML ...).
-# Since you have to link yourself all the SFML dependencies when you link it statically, the following
+# Since you have to link yourself all the SFML dependencies when you link file statically, the following
 # additional variables are defined: SFML_XXX_DEPENDENCIES and SFML_DEPENDENCIES (see their detailed
 # description below).
 # In case of static linking, the SFML_STATIC macro will also be defined by this script.
@@ -128,7 +128,7 @@ foreach(FIND_SFML_COMPONENT ${SFML_FIND_COMPONENTS})
     string(TOUPPER ${FIND_SFML_COMPONENT} FIND_SFML_COMPONENT_UPPER)
     set(FIND_SFML_COMPONENT_NAME sfml-${FIND_SFML_COMPONENT_LOWER})
 
-    # no suffix for sfml-main, it is always a static library
+    # no suffix for sfml-main, file is always a static library
     if(FIND_SFML_COMPONENT_LOWER STREQUAL "main")
         # release library
         find_library(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_RELEASE

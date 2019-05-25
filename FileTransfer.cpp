@@ -1,21 +1,12 @@
-#include <iostream>
-
 #include "FileTransfer.h"
 
-FileTransfer::FileTransfer(std::string directoryLocation) : directoryName(std::move(directoryLocation)),
-                                                            bytesTransferred(0), numFilesTransferred(0),
-                                                            filesTransferred("") {
+FileTransfer::FileTransfer(const std::string &directoryLocation, std::string targetLocation) :
+        bytesTransferred(0), numFilesTransferred(0), destLocation(std::move(targetLocation)),
+        filesTransferred(""), sourceLocation(directoryLocation) {
 
-    //default size of each file
-    fileSize = 300;
-
-    //reads files in the directory
-    //by default the directory has 30 files
-    for (int i = 0; i < 30; i++)
-        fileNames.emplace_back(std::to_string(rand() % 1000) + ".bin");
-    it = fileNames.begin();
-
-
+    //reads files infos in the directory
+    scanDirectory(directoryLocation);
+    file = filesInfos.begin();
 }
 
 void FileTransfer::addObserver(Observer *o) {
@@ -29,45 +20,76 @@ void FileTransfer::removeObserver(Observer *o) {
 void FileTransfer::notify() {
     for (auto o : obs)
         o->update();
-};
+}
 
-bool FileTransfer::Transfer(const std::string &location, sf::RenderWindow &window) {
+bool FileTransfer::Transfer(sf::RenderWindow &window, const std::string &sourcePath, const std::string &destPath) {
 
-    //simulates the file transfer
-    //10 bytes at a time
-    for (int j = 0; j < fileNames.size(); j++, ++it) {
-        bytesTransferred = 0;
-        for (int i = 0; i < fileSize / 10; i++) {
-            //this 'if' explains why progress bars get stuck at the end   \ (•◡•) /
-            if (i > 27)
-                sf::sleep(sf::seconds(0.07));
-            else
-                sf::sleep(sf::seconds(static_cast<float>(rand() % 10) / 250));
-            bytesTransferred += 10;
-            notify();
-        }
+    fs::create_directory(destPath);
 
+    for (const auto &entry : std::filesystem::directory_iterator(sourcePath))
+        if (entry.is_directory()) {
 
-        if (j % 10 == 0)
-            filesTransferred.append("\n");
-        filesTransferred.append((*it) + " ");
+            //recursive call to open every subdirectory if present
+            Transfer(window, entry.path().string(), destPath + "/" + entry.path().filename().string());
+        } else {
 
-        numFilesTransferred++;
-        notify();
+            bytesTransferred = 0;
 
-        //handles the possibility of closing the window during the transfer
-        sf::Event abort;
-        while (window.pollEvent(abort)) {
-            if (abort.type == sf::Event::Closed) {
-                return false;
+            std::ifstream source(entry.path(), std::ios::binary);
+            std::ofstream dest(destPath + "/" + entry.path().filename().string(), std::ios::binary);
+
+            // setting file size
+            int size = file->second;
+
+            // reading source and filling buffer
+            std::vector<char> buffer((std::istreambuf_iterator<char>(source)), std::istreambuf_iterator<char>());
+            //it's not the best way because it has to save a buffer that
+            //has a size equal to the number of bytes of the file, so it's not good for big files
+
+            //writes to file 1 byte at a time
+            for (size_t i = 0; i < size; i++) {
+                dest.write(static_cast<char *> (&buffer[i]), 1);
+
+                //makes debug easier
+                sf::sleep(sf::microseconds(1));
+
+                bytesTransferred++;
+
+                //handles the possibility of closing the window during the transfer
+                sf::Event abort;
+                while (window.pollEvent(abort))
+                    if (abort.type == sf::Event::Closed)
+                        return false;
+
+                notify();
             }
+
+            // clean up
+            source.close();
+            dest.close();
+
+            //updates the files transferred up until this iteration
+            filesTransferred.append((file->first) + "\n");
+            numFilesTransferred++;
+            notify();
+            ++file;
+
         }
-    }
     return true;
 }
 
-const unsigned long FileTransfer::getFileNamesSize() const {
-    return fileNames.size();
+void FileTransfer::scanDirectory(const std::string &directoryLocation) {
+
+    for (const auto &entry : fs::directory_iterator(directoryLocation))
+        if (entry.is_directory())
+            scanDirectory(entry.path());
+        else
+            filesInfos.emplace_back(entry.path().filename(), entry.file_size());
+
+}
+
+const unsigned long FileTransfer::getFilesSize() const {
+    return filesInfos.size();
 }
 
 const int FileTransfer::getNumFilesTransferred() const {
@@ -82,6 +104,43 @@ const int FileTransfer::getBytesTransferred() const {
     return bytesTransferred;
 }
 
-const std::string &FileTransfer::getFileTransferring() const {
-    return *it;
+const std::vector<std::pair<std::string, int>>::iterator &FileTransfer::getFileTransferring() const {
+    return file;
 }
+
+const std::string &FileTransfer::getSourceLocation() const {
+    return sourceLocation;
+}
+
+const std::string &FileTransfer::getDestLocation() const {
+    return destLocation;
+}
+
+void FileTransfer::setFilesInfos(const std::vector<std::pair<std::string, int>> &filesInfos) {
+    FileTransfer::filesInfos = filesInfos;
+}
+
+void FileTransfer::setSourceLocation(const std::string &sourceLocation) {
+    FileTransfer::sourceLocation = sourceLocation;
+}
+
+void FileTransfer::setDestLocation(const std::string &destLocation) {
+    FileTransfer::destLocation = destLocation;
+}
+
+void FileTransfer::setFilesTransferred(const std::string &filesTransferred) {
+    FileTransfer::filesTransferred = filesTransferred;
+}
+
+void FileTransfer::setNumFilesTransferred(int numFilesTransferred) {
+    FileTransfer::numFilesTransferred = numFilesTransferred;
+}
+
+void FileTransfer::setBytesTransferred(int bytesTransferred) {
+    FileTransfer::bytesTransferred = bytesTransferred;
+}
+
+const std::list<Observer *> &FileTransfer::getObs() const {
+    return obs;
+}
+

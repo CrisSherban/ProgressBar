@@ -8,7 +8,7 @@
 
 class DialogBox {
 public:
-    explicit DialogBox(FileTransfer *fileTransfer, unsigned int width = 300, unsigned int height = 30);
+    explicit DialogBox(FileTransfer *fileTransfer, unsigned int width = 300, unsigned int height = 40);
 
     int init();
 
