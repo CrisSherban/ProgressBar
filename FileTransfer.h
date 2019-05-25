@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 class FileTransfer : public Subject {
 
 public:
-    explicit FileTransfer(const std::string &directoryLocation = "./", std::string targetLocation = "./");
+    explicit FileTransfer(const std::string &directoryLocation, std::string targetLocation);
 
     virtual void addObserver(Observer *o) override;
 
@@ -43,6 +43,8 @@ public:
 
     const std::string &getDestLocation() const;
 
+    const std::list<Observer *> &getObs() const;
+
     //setters
     void setFilesInfos(const std::vector<std::pair<std::string, int>> &filesInfos);
 
@@ -55,8 +57,6 @@ public:
     void setNumFilesTransferred(int numFilesTransferred);
 
     void setBytesTransferred(int bytesTransferred);
-
-    const std::list<Observer *> &getObs() const;
 
 
 private:
